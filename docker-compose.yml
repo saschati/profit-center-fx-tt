@@ -1,0 +1,89 @@
+version: '3.8'
+
+x-env-front: &front-env-variables
+    REACT_APP_APP_URL: http://localhost
+
+services:
+
+    reverse-proxy:
+        image: traefik:v2.9
+        command: 
+            --api.insecure=true
+            --providers.docker=true
+            --providers.docker.exposedByDefault=false
+            --providers.docker.network=traefik-public
+            --entryPoints.web.address=:80
+        ports:
+            # The HTTP port
+            - "80:80"
+        networks:
+            - traefik-public
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=traefik-public
+            - traefik.http.routers.reverse-proxy.entryPoints=web
+            - traefik.http.services.reverse-proxy.loadbalancer.server.port=8080
+            - traefik.http.routers.reverse-proxy.rule=Host(`services.traefik.localhost`)
+        depends_on:
+            - frontend
+
+    frontend:
+       build:
+           context: frontend/docker/development/nginx
+       depends_on:
+           - frontend-node
+       networks:
+           - traefik-public
+           - default           
+       labels:
+           - traefik.enable=true
+           - traefik.docker.network=traefik-public
+           - traefik.http.routers.frontend.rule=Host(`localhost`) || Host(`www.localhost`)
+           - traefik.http.routers.frontend.entryPoints=web
+           - traefik.http.services.frontend.loadbalancer.server.port=80
+           - traefik.http.middlewares.frontend-redirect.redirectRegex.regex=^(https?://)www.localhost/(.*)$$
+           - traefik.http.middlewares.frontend-redirect.redirectRegex.replacement=$${1}localhost/$${2}
+           - traefik.http.middlewares.frontend-redirect.redirectRegex.permanent=true
+           - traefik.http.routers.frontend.middlewares=frontend-redirect
+
+    frontend-preview:
+       build:
+           context: frontend/docker/development/node
+       volumes:
+           - ./frontend:/app
+       command: sh -c "until [ -f ./dist/index.html ] ; do sleep 1 ; done && yarn preview"
+       networks:
+           - traefik-public
+           - default           
+       labels:
+           - traefik.enable=true
+           - traefik.docker.network=traefik-public
+           - traefik.http.routers.frontend-preview.rule=Host(`preview.localhost`)
+           - traefik.http.routers.frontend-preview.entryPoints=web
+           - traefik.http.services.frontend-preview.loadbalancer.server.port=3001
+
+    frontend-node:
+       build:
+           context: frontend/docker/development/node
+       environment:
+           <<: *front-env-variables
+           WDS_SOCKET_PORT: 0
+       volumes:
+           - ./frontend:/app
+       command: sh -c "until [ -f .ready ] ; do sleep 1 ; done && yarn start"
+       tty: true
+
+    frontend-node-cli:
+        build:
+            context: frontend/docker/development/node-cli
+        environment:
+            <<: *front-env-variables
+        volumes:
+            - ./frontend:/app
+            - /dev/null:/app/.git
+
+networks:
+    traefik-public:
+        name: traefik-public
