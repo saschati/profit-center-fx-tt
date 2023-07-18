@@ -1,14 +1,17 @@
 import React from 'react'
 import styles from './Layout.module.scss'
 import LayoutProvider from '../Provider/LayoutProvider'
+import classNames from 'classnames/bind'
+
+const cx = classNames.bind(styles)
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }): JSX.Element => {
   return (
     <LayoutProvider>
-      <div className={styles.layout}>
-        <header className={styles.layout__header}>Header</header>
-        <main className={styles.layout__content}>{children}</main>
-        <footer className={styles.layout__footer}>Footer</footer>
+      <div className={cx('layout')}>
+        <header className={cx('layout__header')} />
+        <main className={cx('layout__content')}>{children}</main>
+        <footer className={cx('layout__footer')} />
       </div>
     </LayoutProvider>
   )

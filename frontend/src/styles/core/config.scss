@@ -5,7 +5,14 @@
 // ============= COLORS =============
 $_colors: (
   white: #fff,
+  white-1: #f5f5f5,
   black: #000,
+  gray-1: #1a1a1a,
+  gray-2: #313131,
+  gray-3: #515151,
+  gray-4: #a4a4a4,
+  gray-5: #e3e3e3,
+  red-1: #8f0b0b,
 );
 
 /**
@@ -90,8 +97,8 @@ $lineHeight: 24px;
 
 // ============= FONTS =============
 $_fonts: (
-  syne: (
-    'Inconsolata',
+  base: (
+    'e-Ukraine Regular',
     monospace,
   ),
   // ....,,,,,,,,

@@ -4,8 +4,8 @@ import './styles/index.scss'
 import App from './components/Domain/Container/App'
 import reportWebVitals from './utils/reportWebVitals'
 import Layout from './components/Domain/Container/Layout/Main/Layout'
-import { RouterList } from './components/Domain/Router'
-import { AuthProvider } from './components/Domain/Container/Auth'
+import RouterList from './components/Domain/Router'
+import AuthProvider from './components/Domain/Container/Auth'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(

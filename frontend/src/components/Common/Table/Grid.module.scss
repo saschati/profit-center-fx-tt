@@ -1,0 +1,100 @@
+@use 'src/styles/core/functions' as f;
+@use 'src/styles/core/mixin' as m;
+
+/**
+ * Custom variable:
+ * --grid-col: number; Count grid column
+ */
+.grid {
+  // Setting component section
+  --_grid-header-bg: #{f.color(black)};
+  --_grid-header-clr: #{f.color(white)};
+  --_grid-clr: #{f.color(white)};
+  --_grid-black-sec: #{f.color(gray-1)};
+  --_grid-white-sec: #{f.color(gray-2)};
+  --_grid-bdr-clr: #{f.color(gray-2)};
+  --_grid-bdr-sep-clr: #{f.color(gray-1)};
+  --_grid-bdr-radius: 0;
+
+  display: grid;
+  grid-auto-rows: minmax(47px, max-content);
+  grid-template-columns: repeat(f.v(grid-col), minmax(153px, max-content));
+  border: 1px solid f.v(_grid-bdr-clr);
+  border-radius: f.v(_grid-bdr-radius);
+  width: max-content;
+  overflow: hidden;
+
+  &__row {
+    display: contents;
+
+    &_sec {
+      &_black {
+        .grid__column {
+          @include m.background(f.v(_grid-black-sec));
+        }
+      }
+
+      &_white {
+        .grid__column {
+          @include m.background(f.v(_grid-white-sec));
+        }
+      }
+    }
+
+    &:hover {
+      .grid__column {
+        position: relative;
+        cursor: pointer;
+
+        &::before {
+          position: absolute;
+          pointer-events: none;
+
+          content: '';
+
+          @include m.box(100%, 100%);
+          @include m.background(f.color(white));
+          @include m.coords($t: 0, $l: 0);
+
+          opacity: 0.2;
+        }
+      }
+    }
+  }
+
+  &__column {
+    @include m.flex($ai: center);
+    @include m.ptext(14px, white, $lh: 18px, $ls: 0.14px, $w: 400);
+
+    padding-right: 16px;
+    justify-content: flex-end;
+
+    &_pos {
+      &_left {
+        padding-left: 16px;
+        justify-content: flex-start;
+      }
+
+      &_center {
+        padding-left: 16px;
+        justify-content: center;
+      }
+
+      &_right {
+        padding-left: 16px;
+        justify-content: flex-end;
+      }
+    }
+
+    &_type {
+      &_header {
+        @include m.text($w: 700);
+        @include m.background(f.color(black));
+
+        & + & {
+          border-left: 1px solid f.v(_grid-bdr-sep-clr);
+        }
+      }
+    }
+  }
+}

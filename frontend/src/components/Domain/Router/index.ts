@@ -1,1 +1,1 @@
-export { default as RouterList } from './RouterList'
+export { default } from './RouterList'

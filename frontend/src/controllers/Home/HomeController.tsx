@@ -1,7 +1,12 @@
+import StockQuotes from '@/Domain/StockQuotes/StockQuotes'
 import React from 'react'
 
 const HomeController: React.FC = (): JSX.Element => {
-  return <div>React Skeleton</div>
+  return (
+    <div>
+      <StockQuotes />
+    </div>
+  )
 }
 
 export default HomeController

@@ -1,0 +1,26 @@
+@use '@/styles/core/mixin' as m;
+@use '@/styles/core/functions' as f;
+
+.scrollbar {
+  // Setting component section
+  --_scrollbar-width: 6px;
+  --_scrollbar-track-bg-color: #{f.color(white)};
+  --_scrollbar-thumb-bg-color: #{f.color(black)};
+  --_scrollbar-radius: 10px;
+
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px #0000004d;
+    border-radius: f.v(scrollbar-radius);
+    background-color: f.v(scrollbar-track-bg-color);
+  }
+
+  &::-webkit-scrollbar {
+    width: f.v(scrollbar-width);
+    background-color: f.v(scrollbar-track-bg-color);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: f.v(scrollbar-radius);
+    background-color: f.v(scrollbar-thumb-bg-color);
+  }
+}

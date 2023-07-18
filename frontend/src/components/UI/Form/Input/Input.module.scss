@@ -1,0 +1,44 @@
+@use 'src/styles/core/functions' as f;
+@use 'src/styles/core/mixin' as m;
+
+.input {
+  // Setting component section
+  --_input-bg: transparent;
+  --_input-bdr-clr: #{f.color(black)};
+  --_input-clr: #{f.color(black)};
+
+  // ==== Size ====
+  --_input-width: 100%;
+  --_input-height: 47px;
+  --_input-radius: 0;
+
+  &__group {
+    position: relative;
+  }
+
+  &__handler {
+    @include m.box(f.v(_input-width), f.v(_input-height), f.v(_input-radius));
+    @include m.ptext(18px, $w: 500, $ls: 0.14px, $lh: 22px);
+
+    padding: 11px 16px;
+
+    background-color: f.v(_input-bg);
+    border: 1px solid f.v(_input-bdr-clr);
+    color: f.v(_input-clr);
+
+    &:hover,
+    &:focus {
+      outline: 1px solid f.v(_input-clr);
+    }
+  }
+
+  &__ricon {
+    position: absolute;
+  }
+
+  &__errorMessage {
+    margin-top: 8px;
+
+    @include m.ptext(14px, $w: 400, $lh: 18px, $c: red-1);
+  }
+}

@@ -13,10 +13,7 @@ const userMock: User = {
   email: 'user@user.user',
 }
 
-const FakeAuthProvider: React.FC<FakeAuthProviderProps> = ({
-  children,
-  isAuth = false,
-}): JSX.Element => {
+const FakeAuthProvider: React.FC<FakeAuthProviderProps> = ({ children, isAuth = false }): JSX.Element => {
   const [user, setUser] = useState<UserManager<User>>(() => new UserManager<User>(null))
 
   useMemo(() => {

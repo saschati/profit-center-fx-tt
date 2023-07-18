@@ -1,14 +1,17 @@
 import { UserManager } from '@/app/model/user/manager'
 import { AUTH_TOKEN } from '@/config/constants'
-import useStorage, { StorageType } from '@/hooks/useStorage'
+import useStorage from '@/hooks/useStorage'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { User } from '@/types/model/user'
 import AuthContext from './AuthContext'
 
-const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }): JSX.Element => {
-  const [user, setUser] = useState<UserManager<User>>(() => new UserManager<User>(null))
-  const storage = useStorage(StorageType.LOCAL)
+export type AuthProviderProps = React.PropsWithChildren
 
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }): JSX.Element => {
+  const [user, setUser] = useState<UserManager<User>>(() => new UserManager<User>(null))
+  const storage = useStorage('local')
+
+  /** TODO update logic for real fetch user */
   const [loading] = useState(false)
   const [error] = useState<Error | null>(null)
   const getUser = useCallback(() => {

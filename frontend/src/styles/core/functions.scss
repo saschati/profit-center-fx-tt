@@ -5,19 +5,23 @@
 @use 'sass:string' as str;
 
 @function v($var, $default: false) {
-  @if $default {
-    @return if(
-      (str.index(h.to-string($default), '--') == 0),
-      var(--#{$var}, var($default)),
-      var(--#{$var}, $default)
-    );
+  @if str.index($var, '--') != 1 {
+    $var: --#{$var};
   }
 
-  @return var(--#{$var});
+  @if $default {
+    @return if((str.index(h.to-string($default), '--') == 0), var($var, var($default)), var($var, $default));
+  }
+
+  @return var($var);
 }
 
 @function size($key: 16px) {
-  $size: map.get(c.sizes(base, name), $key);
+  $size: $key;
+
+  @if type-of($key) != 'string' {
+    $size: map.get(c.sizes(base, name), $key);
+  }
 
   @if not $size {
     @error 'Size not found.';

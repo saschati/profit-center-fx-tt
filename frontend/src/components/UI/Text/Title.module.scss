@@ -3,7 +3,7 @@
 
 .title {
   &_position {
-    &_default {
+    &_start {
       @include m.text($ta: start);
     }
 

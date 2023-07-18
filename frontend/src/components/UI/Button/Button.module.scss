@@ -1,0 +1,63 @@
+@use '@/styles/core/functions' as f;
+@use '@/styles/core/mixin' as m;
+@use '@/styles/core/helpers' as h;
+@use '@/styles/core/config' as c;
+@use 'sass:list' as list;
+
+@mixin btn-color($name, $bg, $tc: white) {
+  &_#{$name} {
+    --_btn-bg-color: #{f.color(#{$bg})};
+    --_btn-color: #{f.color(#{$tc})};
+  }
+}
+
+.btn {
+  // Setting component section
+  --_btn-bg-color: #{f.color(black)};
+  --_btn-color: #{f.color(white)};
+  --_btn-padding: 9px 21px 17px 20px;
+  --_btn-height: 47px;
+  --_btn-anim-speed: 0.3s;
+  --_btn-size: #{f.size(regular)};
+  --_btn-lh: #{f.lh(29px)};
+  --_btn-ta: center;
+  --_btn-w: 600;
+  --_btn-ws: nowrap;
+  --_btn-ls: 0.1em;
+  --_btn-bs: 1px;
+
+  background-color: f.v(_btn-bg-color);
+  color: f.v(_btn-color);
+
+  width: 100%;
+  height: f.v(_btn-height);
+  padding: f.v(_btn-padding);
+
+  @include m.text(f.v(_btn-size), $lh: f.v(_btn-lh), $ta: f.v(_btn-ta), $w: f.v(_btn-w), $ls: f.v(_btn-ls));
+  @include m.font(base);
+
+  white-space: f.v(_btn-ws);
+
+  cursor: pointer;
+  transition: f.v(_btn-anim-speed);
+
+  // ACTION
+  &:hover {
+    color: f.v(_btn-bg-color);
+    background-color: transparent;
+    box-shadow: 0 0 0 f.v(_btn-bs) f.v(_btn-bg-color);
+  }
+
+  // COLOR
+  &_color {
+    @each $name in c.colors(name) {
+      $text: 'white';
+
+      @if h.to-string($name) == $text {
+        $text: 'black';
+      }
+
+      @include btn-color($name, $name, $text);
+    }
+  }
+}

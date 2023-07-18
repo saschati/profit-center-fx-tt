@@ -1,7 +1,9 @@
 import React, { memo, useCallback } from 'react'
 import styles from './Pagginate.module.scss'
-import classNames from 'classnames'
+import classNames from 'classnames/bind'
 import ReactPaginate, { type ReactPaginateProps } from 'react-paginate'
+
+const cx = classNames.bind(styles)
 
 type ReactPaginatePropsRequired = Required<Pick<ReactPaginateProps, 'onPageChange'>>
 
@@ -11,13 +13,7 @@ export type PagginateProps = ReactPaginateProps & {
   forcePage: number
 }
 
-const Pagginate: React.FC<PagginateProps> = ({
-  className,
-  onChange,
-  pageCount,
-  forcePage,
-  ...rest
-}): JSX.Element => {
+const Pagginate: React.FC<PagginateProps> = ({ className, onChange, pageCount, forcePage, ...rest }): JSX.Element => {
   const handlerZero = useCallback(() => null, [])
   const handlerPageChange = useCallback<ReactPaginatePropsRequired['onPageChange']>(
     ({ selected }) => onChange(selected + 1),
@@ -26,7 +22,7 @@ const Pagginate: React.FC<PagginateProps> = ({
 
   return (
     <ReactPaginate
-      className={classNames(styles.pagginate, className)}
+      className={cx('pagginate', className)}
       pageCount={pageCount}
       pageRangeDisplayed={4}
       marginPagesDisplayed={2}
@@ -37,16 +33,16 @@ const Pagginate: React.FC<PagginateProps> = ({
       breakLabel="..."
       nextLabel=">"
       previousLabel="<"
-      breakClassName={styles.pagginate__break}
-      breakLinkClassName={styles.pagginate__link}
-      pageClassName={styles.pagginate__item}
-      pageLinkClassName={styles.pagginate__link}
-      previousClassName={classNames(styles.pagginate__previous, styles.pagginate__item)}
-      previousLinkClassName={styles.pagginate__link}
-      nextClassName={classNames(styles.pagginate__next, styles.pagginate__item)}
-      nextLinkClassName={styles.pagginate__link}
-      activeClassName={styles.pagginate__item_type_active}
-      disabledClassName={styles.pagginate__item_type_disabled}
+      breakClassName={cx('pagginate__break')}
+      breakLinkClassName={cx('pagginate__link')}
+      pageClassName={cx('pagginate__item')}
+      pageLinkClassName={cx('pagginate__link')}
+      previousClassName={cx('pagginate__previous', 'pagginate__item')}
+      previousLinkClassName={cx('pagginate__link')}
+      nextClassName={cx('pagginate__next', 'pagginate__item')}
+      nextLinkClassName={cx('pagginate__link')}
+      activeClassName={cx('pagginate__item_type_active')}
+      disabledClassName={cx('pagginate__item_type_disabled')}
       {...rest}
     />
   )

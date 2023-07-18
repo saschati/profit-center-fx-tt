@@ -1,0 +1,24 @@
+@use 'src/styles/core/functions' as f;
+@use 'src/styles/core/mixin' as m;
+
+.table {
+  // Setting component section
+  --_table-bg: #{f.color(gray-1)};
+  --_table-filter-width: 160px;
+
+  padding: 25px 16px 18px;
+  background: f.v(_table-bg);
+  border-radius: 16px;
+
+  &__filter {
+    @include m.flex(wrap, $gap: 8px);
+
+    &Item {
+      width: f.v(_table-filter-width);
+    }
+  }
+
+  &__grid {
+    margin-top: 25px;
+  }
+}

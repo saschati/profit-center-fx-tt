@@ -1,24 +1,17 @@
-import React, { memo } from 'react'
+import React from 'react'
 import styles from './Title.module.scss'
-import classNames from 'classnames'
+import classNames from 'classnames/bind'
+
+const cx = classNames.bind(styles)
 
 type TitleSize = 'default'
-type TitlePosition = 'default' | 'center'
+type TitlePosition = 'start' | 'center'
 
 export type TitleProps = React.PropsWithChildren & {
   className?: string
   size?: TitleSize
   position?: TitlePosition
   as?: keyof JSX.IntrinsicElements | React.FC
-}
-
-const SIZE_TO_CLASS = {
-  default: styles.title_size_default,
-}
-
-const POSITION_TO_CLASS = {
-  default: styles.title_position_default,
-  center: styles.title_position_center,
 }
 
 const Title: React.FC<TitleProps> = ({
@@ -33,18 +26,11 @@ const Title: React.FC<TitleProps> = ({
   return (
     <CustomTag
       data-testid="text-title"
-      className={classNames(
-        styles.title,
-        SIZE_TO_CLASS[size],
-        POSITION_TO_CLASS[position],
-        className
-      )}
+      className={cx('title', `title_size_${size}`, `title_position_${position}`, className)}
     >
       {children}
     </CustomTag>
   )
 }
 
-const TitleMemo = memo(Title)
-
-export default TitleMemo
+export default Title

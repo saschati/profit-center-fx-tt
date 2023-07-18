@@ -9,6 +9,10 @@ export enum Device {
 
 export interface LayoutContextValue {
   device: Device
+  size: {
+    width: number
+    height: number
+  }
 }
 
 export const LayoutContext = createContext<LayoutContextValue | null>(null)

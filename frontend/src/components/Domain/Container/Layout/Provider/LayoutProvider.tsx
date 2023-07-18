@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useMemo, useState } from 'react'
-import { Device, LayoutContext } from './LayoutContext'
+import { Device, LayoutContext, type LayoutContextValue } from './LayoutContext'
 
 const DISPLAY = {
   LAPTOP: 1199,
@@ -9,6 +9,7 @@ const DISPLAY = {
 
 const LayoutProvider: React.FC<React.PropsWithChildren> = ({ children }): JSX.Element => {
   const [device, setDevice] = useState<Device | null>(null)
+  const [size, setSize] = useState<LayoutContextValue['size']>(() => ({ width: 0, height: 0 }))
 
   useLayoutEffect(() => {
     const listener = () => {
@@ -27,6 +28,7 @@ const LayoutProvider: React.FC<React.PropsWithChildren> = ({ children }): JSX.El
       }
 
       setDevice(device)
+      setSize({ width, height })
 
       document.documentElement.style.setProperty('--window-height', `${height}px`)
       document.documentElement.style.setProperty('--window-width', `${width}px`)
@@ -42,8 +44,9 @@ const LayoutProvider: React.FC<React.PropsWithChildren> = ({ children }): JSX.El
   const context = useMemo(() => {
     return {
       device: device || Device.DESCTOP,
+      size,
     }
-  }, [device])
+  }, [device, size])
 
   return <LayoutContext.Provider value={context}>{children}</LayoutContext.Provider>
 }

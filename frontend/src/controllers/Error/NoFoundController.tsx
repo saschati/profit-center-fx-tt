@@ -3,7 +3,7 @@ import React from 'react'
 
 const NoFoundController: React.FC = (): JSX.Element => {
   return (
-    <div className="mt-60">
+    <div>
       <Error code={404} message="Page not found" />
     </div>
   )

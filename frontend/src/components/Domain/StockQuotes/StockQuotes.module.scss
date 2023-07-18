@@ -1,0 +1,37 @@
+@use 'src/styles/core/functions' as f;
+@use 'src/styles/core/mixin' as m;
+
+.stockQuotes {
+  // Setting component section
+  @include m.flex(column, $ai: center);
+
+  &__runner {
+    @include m.flex(column, $gap: 16px);
+
+    width: 600px;
+  }
+
+  &__statisticBtn {
+    // wait
+  }
+
+  &__startGroup {
+    @include m.flex($gap: 16px);
+  }
+
+  &__input {
+    flex: 80% 1;
+  }
+
+  &__startBtn {
+    // wait
+  }
+
+  &__preloader {
+    align-self: center;
+  }
+
+  &__statistic {
+    // wait
+  }
+}
