@@ -6,22 +6,33 @@ interface StockQuotesStatisticPostResponse {
   data: StockQuotesStatistic
 }
 
-interface StockQuotesStatisticsResponse {
+interface GetStockQuotesStatisticsResponse {
   data: StockQuotesStatistic[]
   meta: MetaPagginate
 }
 
-export type StockQuotesStatisticPost = Omit<StockQuotesStatistic, 'id'>
+interface GetStockQuotesStatisticsQuery {
+  page: number
+  lessCreateAt?: string | null
+}
+
+export type StockQuotesStatisticPost = Omit<StockQuotesStatistic, 'id' | 'createdAt'>
 
 export const stockQuotesApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getStatistics: build.query<StockQuotesStatisticsResponse, void>({
-      query: () => ({ url: 'stock-quotes/statistics' }),
+    stockQuotesGetStatistics: build.query<GetStockQuotesStatisticsResponse, GetStockQuotesStatisticsQuery>({
+      query: ({ lessCreateAt = null, page = 1 }) => ({
+        url: 'stock-quotes/statistics',
+        params: {
+          lessCreateAt: lessCreateAt || undefined,
+          page,
+        },
+      }),
       providesTags: ['StockQuotes'],
     }),
-    saveStatistics: build.mutation<StockQuotesStatisticPostResponse, StockQuotesStatisticPost>({
+    stockQuotesSaveStatistics: build.mutation<StockQuotesStatisticPostResponse, StockQuotesStatisticPost>({
       query: (data) => ({
-        url: 'stock-quotes/statistics',
+        url: 'stock-quotes/statistics/save',
         method: 'POST',
         body: data,
       }),
@@ -29,4 +40,8 @@ export const stockQuotesApi = api.injectEndpoints({
   }),
 })
 
-export const { useSaveStatisticsMutation, useGetStatisticsQuery } = stockQuotesApi
+export const {
+  useStockQuotesSaveStatisticsMutation,
+  useStockQuotesGetStatisticsQuery,
+  useLazyStockQuotesGetStatisticsQuery,
+} = stockQuotesApi

@@ -1,0 +1,4 @@
+vendor
+var
+migrations-db.php
+migrations.php

@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react'
 
 // Create our baseQuery instance
 const baseQuery = fetchBaseQuery({
-  baseUrl: '/',
+  baseUrl: import.meta.env.VITE_API_URL as string,
   prepareHeaders: (headers) => {
     // By default, if we have a token in the store, let's use that for authenticated requests
     return headers

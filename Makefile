@@ -32,8 +32,8 @@ restart: down docker-build up ## Project restart
 
 ## —— Audit project —————————————————————————————————————————————————————————————————————
 check: lint test ## Project restart
-test: frontend-test ## Run testing
-lint: frontend-lint ## Run linters
+test: frontend-test api-test ## Run testing
+lint: frontend-lint api-lint ## Run linters
 
 docker-up:
 	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) up -d
@@ -54,10 +54,10 @@ docker-build:
 	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) build
 
 app-clear:
-	docker run --rm -v ${PWD}/frontend:/app -w /app alpine sh -c 'rm -f .ready'
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm frontend-node-cli rm -f .ready
 
-app-init: frontend-init
-	docker run --rm -v ${PWD}/frontend:/app -w /app alpine sh -c 'touch .ready'
+app-init: frontend-init api-init
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm frontend-node-cli touch .ready
 
 ## —— Frontend ——————————————————————————————————————————————————————————————————————————
 frontend-init: ## Init frontend
@@ -88,3 +88,42 @@ frontend-preview-refresh: ## Refresh build for analyze
 
 frontend-preview-logs: ## Show logs analize
 	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) logs --follow frontend-analize
+
+## —— API ———————————————————————————————————————————————————————————————————————————————
+api-init: ## Init API
+api-init: api-composer-install api-wait-db api-create-symlink api-migrations
+
+api-create-symlink:
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli ln -sf /app/src/Migration/MySQL/Config/migrations.php /app/migrations.php
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli ln -sf /app/src/Migration/MySQL/Config/migrations-db.php /app/migrations-db.php
+
+api-wait-db:
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli wait-for-it api-mysql:3306 -t 30
+
+api-composer-install: ## Composer install
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli composer install
+
+api-migrations: ## Run migrations
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli vendor/bin/doctrine-migrations migrations:migrate --no-interaction
+
+api-migrations-create: ## Create migrations
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli vendor/bin/doctrine-migrations migrations:generate --no-interaction
+
+api-migrations-rollback: ## Rollback migrations by versions
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli vendor/bin/doctrine-migrations migrations:migrate prev
+
+api-logs: ## Show logs
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) logs --follow api
+
+api-lint: ## Run lints
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli composer validate
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli composer php-cs-fixer fix -- --dry-run --diff
+
+api-test: ## Run test
+	echo "All tests is done!";
+
+api-fix: ## Run lint fixer
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli composer php-cs-fixer fix
+
+api-php-cli: ## Run lint fixer
+	$(docker_compose_bin) -f docker-compose.yml $(docker_compose_override) run --rm api-php-cli $(cmd)

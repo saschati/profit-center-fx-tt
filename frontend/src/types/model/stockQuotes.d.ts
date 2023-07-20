@@ -9,6 +9,7 @@ export interface SummaryStatisticData {
 export interface StockQuotesStatistic extends SummaryStatisticData {
   id: string
   sessionId: string
-  startDate: number
-  endDate: number
+  startDate: string
+  endDate: string
+  createdAt: string
 }

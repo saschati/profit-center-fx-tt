@@ -11,7 +11,7 @@ import Yup from '@/utils/yup'
 import { v4 as uuidv4 } from 'uuid'
 import collectStatistic from '@/app/model/stockQuotes/collectStatistic'
 import { store } from '@/app/store/redux/store'
-import { stockQuotesApi } from '@/app/store/redux/services/injects/stockQuotes'
+import { stockQuotesApi, useStockQuotesGetStatisticsQuery } from '@/app/store/redux/services/injects/stockQuotes'
 
 const cx = classNames.bind(styles)
 
@@ -20,8 +20,6 @@ type StartValues = {
 }
 
 type SendStartData = {
-  startDate: number
-  endDate: number
   sessionId: string
 }
 
@@ -41,19 +39,23 @@ const calculateCollect = collectStatistic<SendStartData>((statistic, data) => {
   const postData = {
     ...statistic,
     ...data,
+    ...{
+      startDate: statistic.startDate.toISOString(),
+      endDate: statistic.endDate.toISOString(),
+    },
   }
 
-  void store.dispatch(stockQuotesApi.endpoints.saveStatistics.initiate(postData))
+  void store.dispatch(stockQuotesApi.endpoints.stockQuotesSaveStatistics.initiate(postData))
 })
 
 const StockQuotes: React.FC = (): JSX.Element => {
-  const [start, setStart] = useState(() => ({ isStart: false, count: 0, startData: 0, sessionId: '' }))
+  const [start, setStart] = useState(() => ({ isStart: false, count: 0, sessionId: '' }))
   const [isStatistic, setIsStatisric] = useState(false)
+
+  useStockQuotesGetStatisticsQuery({ page: 1 })
 
   useStockQuotesWS((data) => {
     calculateCollect(data.value, start.count, {
-      startDate: start.startData,
-      endDate: new Date().getTime(),
       sessionId: start.sessionId,
     })
   }, start.isStart)
@@ -63,12 +65,13 @@ const StockQuotes: React.FC = (): JSX.Element => {
       ...prevState,
       isStart: true,
       count: values.count as number,
-      startData: new Date().getTime(),
       sessionId: uuidv4(),
     }))
   }, [])
 
-  const handlerStatistic = () => setIsStatisric(!isStatistic)
+  const handlerStatistic = () => {
+    setIsStatisric(!isStatistic)
+  }
 
   return (
     <div className={cx('stockQuotes')}>
@@ -98,6 +101,9 @@ const StockQuotes: React.FC = (): JSX.Element => {
       )}
       {isStatistic && (
         <div className={cx('stockQuotes__statistic')}>
+          <div className={cx('stockQuotes__statisticBackBtn')}>
+            <Button text='Назад' onClick={handlerStatistic} />
+          </div>
           <StockQuotesStatisticGrid />
         </div>
       )}

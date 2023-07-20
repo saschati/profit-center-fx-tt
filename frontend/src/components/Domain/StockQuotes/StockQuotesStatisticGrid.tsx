@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { Grid } from '@/Common/Table'
-import { useGetStatisticsQuery } from '@/app/store/redux/services/injects/stockQuotes'
+import { useTypedSelector } from '@/app/store/redux/store'
+import { useLazyStockQuotesGetStatisticsQuery } from '@/app/store/redux/services/injects/stockQuotes'
+import useElementWatcher from '@/hooks/useElementWatcher'
 
 const headers = [
   {
@@ -34,11 +36,27 @@ const headers = [
 ]
 
 const StockQuotesStatisticGrid: React.FC = (): JSX.Element => {
-  const { data } = useGetStatisticsQuery()
+  const ref = useRef(null)
+  const {
+    stockQuotesStatistics,
+    lessCreateAt,
+    stockQuotesStatisticsCurrentMeta: currentMeta,
+  } = useTypedSelector((state) => state.stockQuotes)
+  const [getStatisticsTrigger] = useLazyStockQuotesGetStatisticsQuery()
+
+  useElementWatcher(ref, () => {
+    const { currentPage = 1, totalPages = 1 } = currentMeta || {}
+
+    if (currentPage >= totalPages) {
+      return
+    }
+
+    void getStatisticsTrigger({ page: currentPage + 1, lessCreateAt })
+  })
 
   const rows = useMemo(() => {
     return (
-      data?.data.map((statistic) => ({
+      stockQuotesStatistics.map((statistic) => ({
         id: statistic.id,
         columns: [
           {
@@ -67,14 +85,19 @@ const StockQuotesStatisticGrid: React.FC = (): JSX.Element => {
           },
           {
             id: 'calculationTime',
-            value: (statistic.endDate - statistic.startDate) / 1000,
+            value: (new Date(statistic.endDate).getTime() - new Date(statistic.startDate).getTime()) / 1000,
           },
         ],
       })) || []
     )
-  }, [data])
+  }, [stockQuotesStatistics])
 
-  return <Grid headers={headers} rows={rows} />
+  return (
+    <div>
+      <Grid headers={headers} rows={rows} />
+      <div ref={ref} />
+    </div>
+  )
 }
 
 export default StockQuotesStatisticGrid

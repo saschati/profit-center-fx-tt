@@ -1,4 +1,4 @@
-<h1 align="center">React App</h1>
+<h1 align="center">Profit Center FX TT</h1>
 <hr/>
 
 ## Global dependencies

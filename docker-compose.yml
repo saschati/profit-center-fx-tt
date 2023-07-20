@@ -1,7 +1,20 @@
 version: '3.8'
 
 x-env-front: &front-env-variables
-    REACT_APP_APP_URL: http://localhost
+    VITE_APP_URL: http://localhost
+    VITE_API_URL: http://api.localhost
+
+x-env-api: &api-env-variables
+    APP_DEBUG: "true"
+    APP_ENV: dev
+    APP_NAME: Profit Center FX TT
+    APP_URL: http://api.localhost
+    DB_HOST: api-mysql
+    DB_DATABASE: app
+    DB_USER: app
+    DB_PORT: 3306
+    DB_PASSWORD: secret
+    DB_TABLE_PREFIX: p_
 
 services:
 
@@ -28,6 +41,7 @@ services:
             - traefik.http.routers.reverse-proxy.rule=Host(`services.traefik.localhost`)
         depends_on:
             - frontend
+            - api
 
     frontend:
        build:
@@ -84,6 +98,64 @@ services:
             - ./frontend:/app
             - /dev/null:/app/.git
 
+    api:
+        build:
+            context: api/docker
+            dockerfile: development/nginx/Dockerfile
+        volumes:
+            - ./api:/app
+        networks:
+            - traefik-public
+            - default
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=traefik-public
+            - traefik.http.routers.api.rule=Host(`api.localhost`)
+            - traefik.http.routers.api.entryPoints=web
+            - traefik.http.services.api.loadBalancer.server.port=80
+
+    api-php-fpm:
+        build:
+            context: api/docker
+            dockerfile: development/php-fpm/Dockerfile
+        environment:
+            <<: *api-env-variables
+            PHP_IDE_CONFIG: serverName=API
+        volumes:
+            - ./api:/app
+        depends_on:
+            - api-mysql
+
+    api-php-cli:
+        build:
+            context: api/docker
+            dockerfile: development/php-cli/Dockerfile
+        environment:
+            <<: *api-env-variables
+        volumes:
+            - ./api:/app
+            - composer:/root/.composer/cache
+        depends_on:
+            - api-mysql
+
+    api-mysql:
+        build:
+            context: api/docker
+            dockerfile: development/mysql/Dockerfile
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: app
+            MYSQL_USER: app
+            MYSQL_PASSWORD: secret
+        volumes:
+            - db:/var/lib/mysql
+        ports:
+            - "33061:3306"
+
 networks:
     traefik-public:
         name: traefik-public
+
+volumes:
+    composer:
+    db:
